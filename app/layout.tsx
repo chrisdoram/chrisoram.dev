@@ -1,7 +1,7 @@
 import "./globals.css"
 import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
-import { ThemeToggle } from "@/components/theme-toggle"
+import { Navbar } from "@/components/nav-bar"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -23,9 +23,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <div className="max-w-2xl mx-auto py-10 px-4">
             <header>
-              <div className="flex items-center justify-between">
-                <ThemeToggle />
-              </div>
+              <Navbar />
             </header>
             <main>{children}</main>
           </div>

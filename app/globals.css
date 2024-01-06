@@ -1,3 +1,26 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  article *:is(h1, h2, h3, h4, h5, h6) {
+    @apply flex items-center gap-2;
+  }
+}
+
+.prose .heading-anchor {
+  @apply absolute float-left ml-[-22px] pr-1;
+}
+
+.prose .heading-anchor > svg {
+  @apply invisible;
+}
+
+.prose .heading-anchor:hover > svg,
+.prose *:hover > .heading-anchor > svg {
+  @apply visible;
+}
+
+blockquote .heading-anchor {
+  @apply invisible;
+}

@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss'
+import typography from '@tailwindcss/typography';
 
 const config: Config = {
   content: [
@@ -7,8 +8,18 @@ const config: Config = {
   ],
   darkMode: ["class"],
   theme: {
-    extend: {},
+    extend: {
+      typography: {
+        // usage: prose-quoteless
+        quoteless: {
+          css: {
+            'blockquote p:first-of-type::before': { content: 'none' },
+            'blockquote p:first-of-type::after': { content: 'none' },
+          },
+        },
+      },
+    },
   },
-  plugins: [],
+  plugins: [typography],
 }
 export default config

@@ -7,9 +7,9 @@ const madeWithLinks = [
     icon: Icons.gitHub,
   },
   {
-    url: "https://contentlayer.dev",
-    label: "Contentlayer",
-    icon: Icons.contentlayer,
+    url: "https://mdxjs.com",
+    label: "MDX",
+    icon: Icons.mdx,
   },
   { url: "https://nextjs.org", label: "Next.js", icon: Icons.next },
 ];

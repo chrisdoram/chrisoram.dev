@@ -2,6 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
+/* rehype-pretty-code blocks */
+
+/* strange but looks for pre, code and span elements with a data-theme containong a space  */
+html.dark pre[data-theme*=" "],
+html.dark pre[data-theme*=" "] code,
+html.dark code[data-theme*=" "] span {
+  color: var(--shiki-dark);
+  background-color: var(--shiki-dark-bg);
+  /* Optional, if you also want font styles */
+  font-style: var(--shiki-dark-font-style);
+  font-weight: var(--shiki-dark-font-weight);
+  text-decoration: var(--shiki-dark-text-decoration);
+}
+
+html.light pre[data-theme*=" "],
+html.light pre[data-theme*=" "] code,
+html.light code[data-theme*=" "] span {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+  /* Optional, if you also want font styles */
+  font-style: var(--shiki-light-font-style);
+  font-weight: var(--shiki-light-font-weight);
+  text-decoration: var(--shiki-light-text-decoration);
+}
+
+.dark pre [data-line][data-highlighted-line],
+.dark pre [data-line][data-highlighted-line] span{
+	--tw-bg-opacity: 1;
+	background-color: rgb(30 41 59/var(--tw-bg-opacity));
+}
+
+pre [data-line][data-highlighted-line],
+pre [data-line][data-highlighted-line] span {
+	background-color: rgb(243 244 246/var(--tw-bg-opacity));
+	--tw-bg-opacity: 0.25;
+}
+
+pre [data-line][data-highlighted-line] {
+  border-left: 2px solid #60a5fa;
+	margin-left: -1rem;
+	margin-right: -1rem;
+	display: inline-block;
+  padding: .125rem 1rem;
+}
+
+/* anchor links */
+
 @layer components {
   article *:is(h1, h2, h3, h4, h5, h6) {
     @apply flex items-center gap-2;

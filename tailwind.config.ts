@@ -10,6 +10,17 @@ const config: Config = {
   theme: {
     extend: {
       typography: {
+        DEFAULT: {
+          css: {
+            // remove backticks from code blocks
+            'code::before': {
+              content: '""'
+            },
+            'code::after': {
+              content: '""'
+            }
+          }
+        },
         // usage: prose-quoteless
         quoteless: {
           css: {

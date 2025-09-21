@@ -5,6 +5,7 @@
     },
     "dependencies": {
         "marked": "^16.3.0",
-        "nue-glow": "^0.2.2"
+        "nue-glow": "^0.2.2",
+        "yaml": "^2.8.1"
     }
 }

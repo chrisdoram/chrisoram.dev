@@ -1,53 +1,55 @@
 #!/usr/bin/env bun
-import { marked } from 'marked'
-import { glow } from 'nue-glow'
-import { readFile, readdir, mkdir, stat } from "node:fs/promises"
+import { marked } from "marked"
+import { glow } from "nue-glow"
+import { readFile, readdir, stat } from "node:fs/promises"
 import { basename, extname, join } from "node:path"
+import YAML from "yaml"
 
 const POSTS_DIR = "posts"
-const TEMPLATE_FILE = "post.html"
 const OUT_DIR = "dist"
-const SLOT_REGEX = /<slot\s*\/>/
+const TEMPLATE_FILE = "post.html"
+const SLOT_RE = /<slot\s*\/>/
+const PLACEHOLDER_RE = /{{\s*([a-zA-Z0-9_.-]+)\s*}}/g
 
-// setup a custom renderer for code blocks
+// global template string
+const template = await readFile(TEMPLATE_FILE, "utf8")
+
+function extractFrontMatter(markdown) {
+  const end = markdown.indexOf("\n---")
+  const fm = markdown.slice(3, end + 1).trim()
+  const body = markdown.slice(end + 4).trimStart()
+  return {fm, body}
+}
+
+function preprocess(markdown) {
+  const { fm, body } = extractFrontMatter(markdown)
+  marked.__post_metadata = YAML.parse(fm)
+  return body
+}
+
+function postprocess(html) {
+  let fullHTML = template.replace(SLOT_RE, html)
+  return fullHTML.replace(PLACEHOLDER_RE, (_, key) => {
+    return marked.__post_metadata[key]
+  })
+}
+
 const renderer = {
   code({ text, lang }) {
     const html = glow(text, { language: lang, numbered: true })
-    return `<pre>${ html }</pre>`
-  } 
+    return `<pre>${html}</pre>`
+  },
 }
-marked.use({renderer})
 
-async function main() {
-  const template = await readFile(TEMPLATE_FILE, "utf8")
-  const posts = await listMarkdownFiles(POSTS_DIR)
+// global marked instance
+marked.use({ renderer, hooks: { preprocess, postprocess } })
+
+
+for (const post of await readdir(POSTS_DIR)) {
+  const postMarkdown = await readFile(join(POSTS_DIR, post), "utf8")
+  const outFile = join(OUT_DIR, basename(post, extname(post)), "index.html")
+  await Bun.write(outFile, marked.parse(postMarkdown))
   
-  if (posts.length == 0) {
-    console.log(`Found no markdown files when processing ${POSTS_DIR}/`)
-    return
-  }
-
-  for (const post of posts) {
-    await buildPost({ post, template })
-  }
-}
-
-async function listMarkdownFiles(dir) {
-  const files = await readdir(dir);
-  return files.filter(file => file.endsWith(".md")).map((markdownFile => join(dir, markdownFile)))
-}
-
-async function buildPost({ post, template }) {
-  const postMarkdown = await readFile(post, "utf8")
-  const postHTML = marked.parse(postMarkdown)
-  const finalHTML = template.replace(SLOT_REGEX, postHTML)
-  const slug = basename(post, extname(post))
-  const outDir = join(OUT_DIR, slug)
-  const outFile = join(outDir, "index.html")
-  await mkdir(outDir, { recursive: true })
-  await Bun.write(outFile, finalHTML)
-  const {size} = await stat(outFile);
+  const { size } = await stat(outFile)
   console.log(`✓ ${post} -> ${outFile} (${size} bytes)`)
 }
-
-main()

@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-import { marked } from "marked"
+import { marked, options } from "marked"
 import { glow } from "nue-glow"
 import { readFile, readdir, stat } from "node:fs/promises"
 import { basename, extname, join } from "node:path"
@@ -18,7 +18,7 @@ function extractFrontMatter(markdown) {
   const end = markdown.indexOf("\n---")
   const fm = markdown.slice(3, end + 1).trim()
   const body = markdown.slice(end + 4).trimStart()
-  return {fm, body}
+  return { fm, body }
 }
 
 function preprocess(markdown) {
@@ -44,12 +44,45 @@ const renderer = {
 // global marked instance
 marked.use({ renderer, hooks: { preprocess, postprocess } })
 
+async function build() {
+  let postItems = []
+  for (const post of await readdir(POSTS_DIR)) {
+    const postMarkdown = await readFile(join(POSTS_DIR, post), "utf8")
+    const slug = basename(post, extname(post))
+    const outFile = join(OUT_DIR, slug, "index.html")
+    await Bun.write(outFile, marked.parse(postMarkdown))
 
-for (const post of await readdir(POSTS_DIR)) {
-  const postMarkdown = await readFile(join(POSTS_DIR, post), "utf8")
-  const outFile = join(OUT_DIR, basename(post, extname(post)), "index.html")
-  await Bun.write(outFile, marked.parse(postMarkdown))
-  
-  const { size } = await stat(outFile)
-  console.log(`✓ ${post} -> ${outFile} (${size} bytes)`)
+    const { size } = await stat(outFile)
+    console.log(`✓ ${post} -> ${outFile} (${size} bytes)`)
+
+    postItems.push({ slug, ...marked.__post_metadata })
+  }
+  postItems.sort((a, b) => (Date.parse(a.date) < Date.parse(b.date) ? 1 : -1))
+  console.log(postItems)
+  let indexTemplate = await readFile("index.html", "utf8")
+  let postItemsHtml = `<ul>
+  ${postItems
+    .map(
+      (item) =>
+        `<li>
+          <time datetime=${new Date(item.date).toISOString()}>${new Date(
+          item.date
+        ).toLocaleDateString(undefined, {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })}</time>
+          <h2>${item.title}</h2>
+          <p>${item.description}</p>
+          <a href="/dist/${item.slug}/index.html">
+              read more →
+          </a>
+      </li>`
+    )
+    .join("\n")}</ul>`
+  console.log(postItemsHtml)
+  let indexHtml = indexTemplate.replace(SLOT_RE, postItemsHtml)
+  Bun.write("dist/index.html", indexHtml)
 }
+
+build()

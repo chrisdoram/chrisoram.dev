@@ -1,0 +1,17 @@
+{
+  "lockfileVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "chrisoram.dev",
+      "dependencies": {
+        "marked": "^16.3.0",
+        "nue-glow": "^0.2.2",
+      },
+    },
+  },
+  "packages": {
+    "marked": ["marked@16.3.0", "", { "bin": { "marked": "bin/marked.js" } }, "sha512-K3UxuKu6l6bmA5FUwYho8CfJBlsUWAooKtdGgMcERSpF7gcBUrCGsLH7wDaaNOzwq18JzSUDyoEb/YsrqMac3w=="],
+
+    "nue-glow": ["nue-glow@0.2.2", "", {}, "sha512-ua/EDUmkWswmSIAAET9MNqwG3lk92eh7H//2XZ3LGJwCojiBukEpGrRyu9Mn5EzU4fHkCvL1ObChTO8OFWMFEg=="],
+  }
+}

@@ -58,7 +58,6 @@ async function build() {
     postItems.push({ slug, ...marked.__post_metadata })
   }
   postItems.sort((a, b) => (Date.parse(a.date) < Date.parse(b.date) ? 1 : -1))
-  console.log(postItems)
   let indexTemplate = await readFile("index.html", "utf8")
   let postItemsHtml = `<ul>
   ${postItems
@@ -72,17 +71,21 @@ async function build() {
           month: "long",
           day: "numeric",
         })}</time>
-          <h2>${item.title}</h2>
+          <h2 id="post-title">${item.title}</h2>
           <p>${item.description}</p>
-          <a href="/dist/${item.slug}/index.html">
+          <a href="/dist/${item.slug}/index.html" aria-describedby="post-title">
               read more →
           </a>
       </li>`
     )
     .join("\n")}</ul>`
-  console.log(postItemsHtml)
+  
   let indexHtml = indexTemplate.replace(SLOT_RE, postItemsHtml)
   Bun.write("dist/index.html", indexHtml)
+
+  await Bun.write(Bun.file("dist/main.css"), Bun.file("main.css"));
+  await Bun.write(Bun.file("dist/glow.css"), Bun.file("glow.css"));
+
 }
 
 build()
